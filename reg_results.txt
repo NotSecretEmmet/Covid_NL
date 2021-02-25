@@ -1,29 +1,29 @@
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:     infect_pct_of_week   R-squared:                       0.259
-Model:                            OLS   Adj. R-squared:                  0.244
-Method:                 Least Squares   F-statistic:                     16.35
-Date:                Thu, 17 Dec 2020   Prob (F-statistic):           3.82e-16
-Time:                        16:30:13   Log-Likelihood:                 637.70
-No. Observations:                 287   AIC:                            -1261.
-Df Residuals:                     280   BIC:                            -1236.
+Dep. Variable:     infect_pct_of_week   R-squared:                       0.277
+Model:                            OLS   Adj. R-squared:                  0.265
+Method:                 Least Squares   F-statistic:                     22.35
+Date:                Thu, 25 Feb 2021   Prob (F-statistic):           2.74e-22
+Time:                        13:08:46   Log-Likelihood:                 814.53
+No. Observations:                 357   AIC:                            -1615.
+Df Residuals:                     350   BIC:                            -1588.
 Df Model:                           6                                         
 Covariance Type:            nonrobust                                         
 ===========================================================================================
                               coef    std err          t      P>|t|      [0.025      0.975]
 -------------------------------------------------------------------------------------------
-Intercept                   0.1585      0.004     38.227      0.000       0.150       0.167
-C(weekday)[T.Monday]       -0.0341      0.006     -5.822      0.000      -0.046      -0.023
-C(weekday)[T.Saturday]      0.0007      0.006      0.124      0.901      -0.011       0.012
-C(weekday)[T.Sunday]       -0.0047      0.006     -0.798      0.426      -0.016       0.007
-C(weekday)[T.Thursday]     -0.0077      0.006     -1.311      0.191      -0.019       0.004
-C(weekday)[T.Tuesday]      -0.0396      0.006     -6.746      0.000      -0.051      -0.028
-C(weekday)[T.Wednesday]    -0.0244      0.006     -4.159      0.000      -0.036      -0.013
+Intercept                   0.1584      0.003     45.331      0.000       0.152       0.165
+C(weekday)[T.Monday]       -0.0341      0.005     -6.891      0.000      -0.044      -0.024
+C(weekday)[T.Saturday]     -0.0010      0.005     -0.203      0.839      -0.011       0.009
+C(weekday)[T.Sunday]       -0.0072      0.005     -1.447      0.149      -0.017       0.003
+C(weekday)[T.Thursday]     -0.0045      0.005     -0.907      0.365      -0.014       0.005
+C(weekday)[T.Tuesday]      -0.0402      0.005     -8.133      0.000      -0.050      -0.030
+C(weekday)[T.Wednesday]    -0.0220      0.005     -4.450      0.000      -0.032      -0.012
 ==============================================================================
-Omnibus:                       60.771   Durbin-Watson:                   1.411
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              354.941
-Skew:                           0.687   Prob(JB):                     8.42e-78
-Kurtosis:                       8.272   Cond. No.                         7.87
+Omnibus:                       78.364   Durbin-Watson:                   1.384
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              532.361
+Skew:                           0.709   Prob(JB):                    2.51e-116
+Kurtosis:                       8.812   Cond. No.                         7.87
 ==============================================================================
 
 Notes:

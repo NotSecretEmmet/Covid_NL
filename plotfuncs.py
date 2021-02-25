@@ -390,7 +390,6 @@ def plot_testing_data(dframe, rapport_name, target_dir=None):
     # Set ticker spacing
     ax.yaxis.set_major_locator(ticker.MultipleLocator(25000))
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    
     # Plot data
     ax.bar(dframe.week_number, dframe.aantal_testen, 
         0.49, label='Tests', align='center')
