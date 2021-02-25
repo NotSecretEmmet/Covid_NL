@@ -1,4 +1,5 @@
 import os
+import math
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -27,7 +28,7 @@ def plot_weekly(dframe, target_dir=None):
     fig, ax = plt.subplots(figsize=(12.8, 9.6))
     fig.suptitle('Reported weekly COVID-19 data Netherlands')
     df_week = dframe.drop_duplicates(subset='week_number')
-    weeks = df_week.week_number.astype('int').unique()
+    weeks = df_week.week_number.unique()
     width = 0.6
     
     p1 = ax.bar(weeks,
@@ -49,8 +50,8 @@ def plot_weekly(dframe, target_dir=None):
 
     # Set limits on y and x axis
     ax.set_ylim(0, df_week.infection_week.max() + 2000)
-    ldate = df_week.week_number.min() - 1
-    hdate = df_week.week_number.max() + 1
+    ldate = df_week.week_number.min() 
+    hdate = df_week.week_number.max()
     ax.set_xbound(ldate, hdate)
     # Set ticker spacing
     ax.yaxis.set_major_locator(ticker.MultipleLocator(2000))
@@ -59,11 +60,13 @@ def plot_weekly(dframe, target_dir=None):
     set_grid(ax)
     # Add source annotation
     ax.annotate(f'Source: RIVM https://data.rivm.nl/covid-19/',
-        xy=(0.5, 0), xytext=(0, 10),
+        xy=(0.5, 0), xytext=(0, 12),
         xycoords=('axes fraction', 'figure fraction'),
         textcoords='offset points',
         size=8, ha='center', va='bottom')
-
+    
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=8)
     plt.legend(loc='upper left', frameon=False)
     plt.xlabel('Week')
     plt.ylabel('Reported amount')
@@ -77,7 +80,7 @@ def plot_weekly(dframe, target_dir=None):
 
 def plot_current_ic_zkh(dframe, target_dir=None):
 
-    df_current = dframe[dframe['week_number'] > 7]
+    df_current = dframe
     fig = plt.figure(figsize=(13.8, 11.6))
     width = 0.5
     fig.tight_layout()
@@ -149,7 +152,7 @@ def subplot_daily_infections(dframe, target_dir=None):
     fig_ax1.yaxis.set_major_locator(ticker.MultipleLocator(500))
 
     fig_ax2 = fig.add_subplot(gs1[-1, :-1])
-    fig_ax2.set_title('Reported hospital Admissions', fontsize=8)
+    fig_ax2.set_title('Reported hospital admissions', fontsize=8)
     fig_ax2.bar(dframe.date, 
         dframe.hospital_day,
         width=1,
@@ -193,7 +196,7 @@ def subplot_daily_infections(dframe, target_dir=None):
         plt.setp(f.get_yticklabels(),  
             fontsize=8)
 
-
+    plt.xlabel('Date')
     fig_ax1.annotate(f'Source: RIVM https://data.rivm.nl/covid-19/',
         xy=(0.5, 0), xytext=(0, 10),
         xycoords=('axes fraction', 'figure fraction'),
@@ -210,8 +213,12 @@ def subplot_daily_infections(dframe, target_dir=None):
         plt.close()
 
 def subplot_weekly(dframe, target_dir=None):
-    df_week = dframe.drop_duplicates(subset='week_number')
-    weeks = df_week.week_number.astype('int').unique()
+    df_week = dframe.drop_duplicates(subset='week_number').copy()
+    df_week['local_max'] = df_week.infection_week[
+        (df_week.infection_week.shift(1) < df_week.infection_week) & 
+        (df_week.infection_week.shift(-1) < df_week.infection_week)
+        ]
+    weeks = df_week.week_number.unique()
     width = 0.6
     fig = plt.figure(figsize=(12.8, 9.6))
     fig.tight_layout()
@@ -230,13 +237,17 @@ def subplot_weekly(dframe, target_dir=None):
     fig_ax1.legend(loc='upper right', frameon=False)
 
 
-    for x,y in zip(weeks, df_week.infection_week):
-        fig_ax1.text(x, y+0.05, int(y),
-            ha='center',
-            va= 'bottom', 
-            fontsize=8,
-            alpha=0.8,
-            color='black')
+    for x,y in zip(weeks, df_week.local_max):
+        if not math.isnan(y):
+            fig_ax1.text(x, y+0.05, int(y),
+                ha='center',
+                va= 'bottom', 
+                fontsize=8,
+                alpha=1,
+                color='black')
+
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=6)
 
     fig_ax2 = fig.add_subplot(gs1[1 , : ])
     fig_ax2.set_title('Reported hospital admissions & deaths', fontsize=10)
@@ -254,8 +265,8 @@ def subplot_weekly(dframe, target_dir=None):
         label='Reported deaths')
     fig_ax2.legend(loc='upper right', frameon=False)
     
-    ldate = df_week.week_number.min() - 1
-    hdate = df_week.week_number.max() + 1
+    ldate = df_week.week_number.min() 
+    hdate = df_week.week_number.max() 
     
     for f in [fig_ax1, fig_ax2]:
         set_grid(f)
@@ -269,6 +280,8 @@ def subplot_weekly(dframe, target_dir=None):
         textcoords='offset points',
         size=8, ha='center', va='bottom')
     
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=6)
     plt.xlabel('Week')
    
     if target_dir:
@@ -279,28 +292,34 @@ def subplot_weekly(dframe, target_dir=None):
         plt.close()
 
 def plot_weekly_infections(dframe, target_dir=None):
+    df = dframe.drop_duplicates(subset='week_number').copy()
+    df['local_max'] = df.infection_week[
+        (df.infection_week.shift(1) < df.infection_week) & 
+        (df.infection_week.shift(-1) < df.infection_week)
+        ]
     fig = plt.figure(figsize=(12.8, 9.6))
     fig.tight_layout()
     fig.suptitle('Reported infections by week')
     ax = plt.subplot(111)
-    ax.bar(dframe["week_number"].astype('int').unique(),
-        dframe["infection_week"].unique(),
+    ax.bar(df["week_number"].unique(),
+        df["infection_week"].unique(),
         edgecolor='white',
         width=0.6,
         label='Weekly reported infections')
 
-    for x,y in zip(dframe.week_number, dframe.infection_week):
-        plt.text(x, y+0.05, int(y),
-            ha='center',
-            va= 'bottom', 
-            fontsize=8,
-            alpha=0.4,
-            color='gray')
+    for x,y in zip(df.week_number, df.local_max):
+        if not math.isnan(y):
+            plt.text(x, y+0.05, int(y),
+                ha='center',
+                va= 'bottom', 
+                fontsize=8,
+                alpha=1,
+                color='black')
 
     # Set limits on y and x axis
-    ax.set_ylim(0, dframe.infection_week.max() + 2000)
-    ldate = dframe.week_number.min() - 1
-    hdate = dframe.week_number.max() + 1
+    ax.set_ylim(0, df.infection_week.max() + 2000)
+    ldate = df.week_number.min()
+    hdate = df.week_number.max()
     ax.set_xbound(ldate, hdate)
     # Set ticker spacing
     ax.yaxis.set_major_locator(ticker.MultipleLocator(2500))
@@ -308,7 +327,8 @@ def plot_weekly_infections(dframe, target_dir=None):
     plt.legend(loc='upper left', frameon=False)
     plt.xlabel('Week')
     plt.ylabel('Reported infections')
-
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=8)
     set_grid(ax)
 
     # Add source annotation
@@ -377,19 +397,14 @@ def plot_daily_infections(dframe, target_dir=None):
         plt.close()
 
 def plot_testing_data(dframe, rapport_name, target_dir=None):
-
     fig = plt.figure(figsize=(12.8, 9.6))
     fig.tight_layout()
     ax = plt.subplot(111)
     fig.suptitle('Weekly reported test results GGD')
     # Set limits on y and x axis
-    ldate = dframe.week_number.min() - 1
-    hdate = dframe.week_number.max() + 1
-    ax.set_xbound(ldate, hdate)
     ax.set_ylim(0, dframe.aantal_testen.max() + 100000)
     # Set ticker spacing
     ax.yaxis.set_major_locator(ticker.MultipleLocator(25000))
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     # Plot data
     ax.bar(dframe.week_number, dframe.aantal_testen, 
         0.49, label='Tests', align='center')

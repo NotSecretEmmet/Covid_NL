@@ -10,6 +10,7 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.pdfinterp import PDFPageInterpreter
+import isoweek
 
 def extract_text_by_page(pdf_path):
     ''' Extracts text from each page of the 
@@ -131,7 +132,7 @@ def dowload_rapport(url, pdf_name, target_dir):
         f.write(response.content)
     print('New rapport downloaded')
 
-def diagnize_table(dframe):
+def diagnose_table(dframe):
     ''' Checks if amount of columns in extraced data table
     is equal to 4. If not, exit program. (Would indicate
     a change in the table format/ column width). '''
@@ -141,12 +142,17 @@ def diagnize_table(dframe):
     else:
         print('Parsing succesfull.')
 
+def calculate_week_numer(row):
+    ''' Function using the Isoweek module to calculate the week number
+    corresponsing with a given date. '''
+    return isoweek.Week.withdate(row['start_dt']).isoformat()
+
 def process_test_data_df(dframe):
     ''' Parses dataframe with GGD testing data. First removes all
     redundant rows based on numerical values in column 2, and drops
     the totals row. Next, caculates the week numbers of the
     date ranges. Finally, exports the data to a csv files. '''
-    diagnize_table(dframe)   
+    diagnose_table(dframe)   
     dframe = dframe[pd.to_numeric(dframe.iloc[:, 2], 
         errors='coerce').notnull()]
     dframe = dframe[dframe.iloc[:, 0] != 'Totaal']
@@ -161,7 +167,7 @@ def process_test_data_df(dframe):
         pat=' - ', n=1, expand=True)
     dframe['start_dt'] = pd.to_datetime(dframe.start_dt, format='%d-%m-%Y')
     dframe['end_dt'] = pd.to_datetime(dframe.end_dt, format='%d-%m-%Y')
-    dframe['week_number'] = dframe.start_dt.dt.isocalendar().week
+    dframe['week_number'] = dframe.apply(calculate_week_numer, axis=1)
     dframe['aantal_testen'] = pd.to_numeric(dframe['aantal_testen'])
     dframe['perentage_positief'] = pd.to_numeric(dframe['perentage_positief'])
     dframe = dframe.drop(columns= ['date'])
@@ -200,10 +206,8 @@ def main():
             if table_page_num:
                 test_data_df = extract_table(table_page_num, pdf_path)
                 dframe = process_test_data_df(test_data_df)
-                return dframe, cur_pdf_name
-        else:
-            dframe = pd.read_csv(target_fp)
-            return dframe, cur_pdf_name
+        dframe = pd.read_csv(target_fp)
+        return dframe, cur_pdf_name
 
 if __name__ == '__main__':
     main()

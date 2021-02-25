@@ -2,6 +2,8 @@ import requests
 import json
 import pandas as pd
 import os
+import isoweek
+import datetime
 
 def check_request_response(response):
     if response.raise_for_status() is None:
@@ -22,6 +24,11 @@ def get_nice_data(headers, nice_url, variable_name):
         dframe['date'] = pd.to_datetime(dframe.date)
         return dframe
 
+def calculate_week_numer(row):
+    ''' Function using the Isoweek module to calculate the week number
+    corresponsing with a given date. '''
+    return isoweek.Week.withdate(row['date']).isoformat()
+
 def get_rivm_data_main(headers, url):
     ''' Retreives RIVM data using requests. Additionally sets up the 
     date column as datetime and calculates ISO week number. 
@@ -32,7 +39,7 @@ def get_rivm_data_main(headers, url):
         try:
             dframe = pd.DataFrame(json.loads(response.content))
             dframe['date'] = pd.to_datetime(dframe.Date_of_publication)
-            dframe['week_number'] = dframe.date.dt.isocalendar().week
+            dframe['week_number'] = dframe.apply(calculate_week_numer, axis=1)
             return dframe
         except ValueError:
             print('None JSON response received from RIVM')

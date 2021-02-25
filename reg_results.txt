@@ -4,7 +4,7 @@ Dep. Variable:     infect_pct_of_week   R-squared:                       0.277
 Model:                            OLS   Adj. R-squared:                  0.265
 Method:                 Least Squares   F-statistic:                     22.35
 Date:                Thu, 25 Feb 2021   Prob (F-statistic):           2.74e-22
-Time:                        13:08:46   Log-Likelihood:                 814.53
+Time:                        16:45:19   Log-Likelihood:                 814.54
 No. Observations:                 357   AIC:                            -1615.
 Df Residuals:                     350   BIC:                            -1588.
 Df Model:                           6                                         
@@ -20,9 +20,9 @@ C(weekday)[T.Thursday]     -0.0045      0.005     -0.907      0.365      -0.014 
 C(weekday)[T.Tuesday]      -0.0402      0.005     -8.133      0.000      -0.050      -0.030
 C(weekday)[T.Wednesday]    -0.0220      0.005     -4.450      0.000      -0.032      -0.012
 ==============================================================================
-Omnibus:                       78.364   Durbin-Watson:                   1.384
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              532.361
-Skew:                           0.709   Prob(JB):                    2.51e-116
+Omnibus:                       78.368   Durbin-Watson:                   1.384
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              532.430
+Skew:                           0.709   Prob(JB):                    2.42e-116
 Kurtosis:                       8.812   Cond. No.                         7.87
 ==============================================================================
 
