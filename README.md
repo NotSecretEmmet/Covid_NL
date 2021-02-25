@@ -70,6 +70,7 @@ Project created with Python 3.8. Packages used:
 * Matplotlib
 * Pdfminer
 * Tabula-Py
+* Isoweek
 
 ## Development:
 Ideas for possible future extensions to the project include the following:
